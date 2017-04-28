@@ -8,5 +8,13 @@ env:
   - secure: eqhvPJM549t4592+zB5832CZwEEsqk23TVjQN1DCc0gsBXzbZ7uFxjvrYUO995J31b+VvJ6LByeQl2YWEBmMSgH1anV5olsd8STIIoZs5U9VRmSTTRypFPrRmBSWoMbWomVHnDN2iuvNLos6/9B6d7G/pZ7xcngogMyyO0I6ZT0sKBTXZniK3PB70ibz8/5rK3T6CGUga4YpOxNmdS2CU9L+UuYRFwCUv+LRKFQWk6qSkel+VZVZGvnaq4tpQVHMomKphnnk2NXIugwzdoFK6tC5lci83HtgUIfL/xDeC/hZMbZWfAKRoGaz9Ifq0mDpI09lSXs3yFqKoAHo2WqmjAQozgwt4E2Iq+D/c66gn/6DgHQK53h2ogl25nRzj6cpVMS2i0RAVvqysROr3eeUGuVdqifwAwBnaSQTEn+dU0QwqFtkQ3UFeT2g+YdKCw1V7zGqhL6fOx6rswBoqbryzzJfaQ01vRlxLagaXMVe0dEvHEeLGdYHzWcZ/rVl25KN1ijoImObDE02rfE+cTYe9UAHbjY6yzHKSfk/G20r7+pVhUTxOfQQK6C3U+1hIoqnqpddSU3z+W8mJDiwrOaY19/gwZknt9Idzh/6kmLlfKfBlwwzkKMS/hY9vJ9vvZZiJFRaQqwQBc+is/Sf/mbar4c22XqVnD1gebHmtxxLdXM=
   - secure: je+shjIiw2sqoXjI4cxq9Co5Yg27mPblFe5kTotc1Vep7Ihc7bNThMwLcKHPatqYuHIlMU6bXZQ4fT8GE197nkmsrFnHBs7qxo1LFMVMT6+lNV+5LXbBr+LyRe7l7/N9U8bwGzDXfbXNqngkT/K5MYtSVq797TbSiC2Xm6glWyNPV3KliMnVW2PJxmJhHOUGb0gt+xJXWoVlsrHEC6HMN3i7W/T4Dluuz/1Lf6lZinq4JZj6e0LkmTjSyt7v9ZMhr+rMbaF1XuZNoZHBwkmtueg6F21mBcFxHUL5CTdVf9M/94OJ4Qeh8IaQWZsQoezNtCCRa5NPxszgL+jVPYfaIlMgNk7mwwEIqDMCZzVZX8NccSEe54SxBdhS2kMxPXu3tSvAF+LQT1ciDEzpq62v6uX+9yW6f/+Af27NTxv1vdmD8s4RFRnj/9smUF+Ns1CkmIB1Jj9B1cudWH1swOrOGCBUBse8E3F/VvzUbgCf+UlxkU1OmFwzDHuTpphH1+HSdlarsWdW5UVOj1cHu9I7fKujJi3PURG1008QfWYxTbsnD4BilC/yaTNEgtEV5Yiy3FF+bbeYzDJyepVLESXjiIEtMynP80ddc+bxurk+iJxaqOpPC+Q1LGK1k1joxxfQbVqmDUfWyKpW7KaGE2FFTndSKOIcSzOYbin4vu7lkPM=
 after_success:
-- mvn clean deploy -DaltDeploymentRepository=ossrh::default::https://oss.sonatype.org/content/repositories/snapshots -DskipTests -B --settings .travis-deploy-settings.xml
+- VERSION=`python -c "import xml.etree.ElementTree as ET;  print(ET.parse(open('pom.xml')).getroot().find('{http://maven.apache.org/POM/4.0.0}version').text)"`
+- echo "Found version $VERSION"
+- if [[ $VERSION == *-SNAPSHOT ]]; 
+  then 
+    echo "Deploying to OSSRH Snapshots...";
+    mvn clean deploy -DaltDeploymentRepository=ossrh::default::https://oss.sonatype.org/content/repositories/snapshots -DskipTests -B --settings .travis-deploy-settings.xml;
+  else 
+    echo "Release version, deploy is manual.";
+  fi
 
